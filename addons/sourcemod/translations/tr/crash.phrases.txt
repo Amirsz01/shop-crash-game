@@ -1,0 +1,91 @@
+// Exported from SourceMod Translator
+// Date: 2020-08-11 13:13:14 UTC
+// Language: Turkish (tr)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/328
+//
+"Phrases"
+{
+
+	"Yetersizkredi"
+	{
+		"tr"		"Yeterli krediye sahip değilsin."
+	}
+
+	"Yuksekbahis"
+	{
+		"tr"		"Girdiğiniz kredi miktarı, girebileceğiniz maksimum tutardan daha fazla. Maksimum bahis miktarı {1} kredidir."
+	}
+
+	"Endusukbahis"
+	{
+		"tr"		"Girdiğiniz kredi miktarı, girebileceğiniz minimum tutardan daha az. Minimum bahis miktarı {1} kredidir."
+	}
+
+	"bahisbasarili"
+	{
+		"tr"		"Bahisin başarıyla alındı. Crash'in  başlamasına 3 saniye kala menüyü otomatik olarak göreceksin."
+	}
+
+	"zatenbahis"
+	{
+		"tr"		"Zaten bahse girdiniz."
+	}
+
+	"isstartedd"
+	{
+		"tr"		"Oyun başlamışken bahis yapamazsınız."
+	}
+
+	"sondakika"
+	{
+		"tr"		"Crash oyununun başlamasına son {green}{1} dakika{default}."
+	}
+
+	"1dakika"
+	{
+		"tr"		"Crash oyununun başlamasına son {green}1 dakika"
+	}
+
+	"sonsaniye"
+	{
+		"tr"		"Crash oyununun başlamasına son {green}{1} saniye."
+	}
+
+	"basliyoroc"
+	{
+		"tr"		"Başlamasına"
+	}
+
+	"5xkazandin"
+	{
+		"tr"		"{blue}{1} Crash oyununda {default}{2}x ile {green}{3} {default}kredi kazandı."
+	}
+
+	"1xkazandin"
+	{
+		"tr"		"{default}Crash oyununda {default}{1}x ile {green}{2} {default}kredi kazandın."
+	}
+
+	"bahisicin"
+	{
+		"tr"		"|Bahis yapmak icin|"
+	}
+
+	"komut"
+	{
+		"tr"		"!Crash <kredi>"
+	}
+
+	"bahis"
+	{
+		"tr"		"Bahis"
+	}
+
+	"kazanilan"
+	{
+		"tr"		"Kazanilan"
+	}
+
+}

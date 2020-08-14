@@ -1,0 +1,91 @@
+// Exported from SourceMod Translator
+// Date: 2020-08-11 13:13:14 UTC
+// Language: Italian (it)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/328
+//
+"Phrases"
+{
+
+	"Yetersizkredi"
+	{
+		"it"		"Non hai abbastanza crediti."
+	}
+
+	"Yuksekbahis"
+	{
+		"it"		"L'importo che hai inserito è troppo alto. L'importo massimo è di {1} crediti."
+	}
+
+	"Endusukbahis"
+	{
+		"it"		"L'importo che hai inserito è troppo basso. L'importo minimo è di {1} crediti."
+	}
+
+	"bahisbasarili"
+	{
+		"it"		"La tua scommessa è stata accettata. Vedrai il menu del crash 3 secondi prima che inizi."
+	}
+
+	"zatenbahis"
+	{
+		"it"		"Hai già piazzato la tua scommessa."
+	}
+
+	"isstartedd"
+	{
+		"it"		"Il crash è già iniziato, non puoi scommettere ora."
+	}
+
+	"sondakika"
+	{
+		"it"		"{green}{1} minuti all'inizio del crash."
+	}
+
+	"1dakika"
+	{
+		"it"		"{green}1 minuto all'inizio del crash."
+	}
+
+	"sonsaniye"
+	{
+		"it"		"{green}{1} secondi all'inizio del crash."
+	}
+
+	"basliyoroc"
+	{
+		"it"		"Iniziando"
+	}
+
+	"5xkazandin"
+	{
+		"it"		"{1} ha vinto {3} crediti con x{2} nel crash."
+	}
+
+	"1xkazandin"
+	{
+		"it"		"Hai vinto {3} crediti con x{2} nel crash."
+	}
+
+	"bahisicin"
+	{
+		"it"		"|Se vuoi scommettere|"
+	}
+
+	"komut"
+	{
+		"it"		"!Crash <crediti>"
+	}
+
+	"bahis"
+	{
+		"it"		"Puntata"
+	}
+
+	"kazanilan"
+	{
+		"it"		"Ottenuto"
+	}
+
+}

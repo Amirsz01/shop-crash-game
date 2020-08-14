@@ -1,0 +1,91 @@
+// Exported from SourceMod Translator
+// Date: 2020-08-11 13:13:14 UTC
+// Language: Russian (ru)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/328
+//
+"Phrases"
+{
+
+	"Yetersizkredi"
+	{
+		"ru"		"У вас нет достаточно кредитов."
+	}
+
+	"Yuksekbahis"
+	{
+		"ru"		"Введенная сумма превышает максимальную сумму. Максимальная ставка составляет {1} кредит(ов)."
+	}
+
+	"Endusukbahis"
+	{
+		"ru"		"Введенная сумма меньше минимальной суммы. Минимальная ставка составляет {1} кредит(ов)."
+	}
+
+	"bahisbasarili"
+	{
+		"ru"		"Ваша ставка принята! Вы увидите меню автоматически за 3 секунды до начала игры."
+	}
+
+	"zatenbahis"
+	{
+		"ru"		"Вы уже сделали ставку."
+	}
+
+	"isstartedd"
+	{
+		"ru"		"Вы не можете сделать ставку пока игра идет."
+	}
+
+	"sondakika"
+	{
+		"ru"		"{green}{1} минут(ы) {default}до начала игры."
+	}
+
+	"1dakika"
+	{
+		"ru"		"{green}1 минута {default}до начала игры."
+	}
+
+	"sonsaniye"
+	{
+		"ru"		"{green}{1} секунд(ы) {default}до начала игры."
+	}
+
+	"basliyoroc"
+	{
+		"ru"		"Начало"
+	}
+
+	"5xkazandin"
+	{
+		"ru"		"{1} выиграл {3} кредитов с коэффициентом x{2}."
+	}
+
+	"1xkazandin"
+	{
+		"ru"		"Вы выиграли {2} кредитов с коэффициентом x{1}."
+	}
+
+	"bahisicin"
+	{
+		"ru"		"|Сделать ставку|"
+	}
+
+	"komut"
+	{
+		"ru"		"!Crash <кредиты>"
+	}
+
+	"bahis"
+	{
+		"ru"		"Сумма ставки"
+	}
+
+	"kazanilan"
+	{
+		"ru"		"Полученный"
+	}
+
+}

@@ -1,0 +1,97 @@
+// Exported from SourceMod Translator
+// Date: 2020-08-11 13:13:14 UTC
+// Language: English (en)
+// 
+// To view other translations for this plugin, please visit:
+// http://translator.mitchdempsey.com/sourcemod_plugins/328
+//
+"Phrases"
+{
+
+	"Yetersizkredi"
+	{
+		"en"		"You don't have enough credits."
+	}
+
+	"Yuksekbahis"
+	{
+		"#format"	"{1:d}"
+		"en"		"The amount you have entered is higher than the maximum amount. Maximum bet is {1} credits."
+	}
+
+	"Endusukbahis"
+	{
+		"#format"	"{1:d}"
+		"en"		"The amount you have entered is less than the minimum amount. The minimum bet is {1} credits."
+	}
+
+	"bahisbasarili"
+	{
+		"en"		"Your bet has been placed successfully. You will see the menu automatically 3 seconds before the crash starts."
+	}
+
+	"zatenbahis"
+	{
+		"en"		"You have already bet."
+	}
+
+	"isstartedd"
+	{
+		"en"		"You cannot bet while the game is already on."
+	}
+
+	"sondakika"
+	{
+		"#format"	"{1:d}"
+		"en"		"{default}Last {green}{1} minutes {default}before crash starts."
+	}
+
+	"1dakika"
+	{
+		"en"		"Last {green}1 minute {default}before crash starts."
+	}
+
+	"sonsaniye"
+	{
+		"#format"	"{1:d}"
+		"en"		"{default}Last {green}{1} second {default}before crash starts."
+	}
+
+	"basliyoroc"
+	{
+		"en"		"Starting"
+	}
+
+	"5xkazandin"
+	{
+		"#format"	"{1:N},{2:2.2f},{3:d}"
+		"en"		"{1} won {3} credits with x{2} in crash."
+	}
+
+	"1xkazandin"
+	{
+		"#format"	"{1:2.2f},{2:d}"
+		"en"		"You won {3} credits with x{2} in crash."
+	}
+
+	"bahisicin"
+	{
+		"en"		"|If you want to bet|"
+	}
+
+	"komut"
+	{
+		"en"		"!Crash <credits>"
+	}
+
+	"bahis"
+	{
+		"en"		"Bet Amount"
+	}
+
+	"kazanilan"
+	{
+		"en"		"Gained"
+	}
+
+}
