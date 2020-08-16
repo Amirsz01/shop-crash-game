@@ -14,7 +14,7 @@ public Plugin myinfo =
 	name = "[Shop] Crash Game",
 	author = "Emur, Amirsz",
 	description = "Crash game for players.",
-	version = "1.2.2",
+	version = "1.2.3",
 	url = "https://steamcommunity.com/id/EmurIsTaken/"
 };
 //CVars
@@ -76,7 +76,7 @@ public void OnMapEnd()
 public void OnClientDisconnect(int client) // Каллбек нашего таймера
 {
 	char steamid[32];
-	if(situation[client] == 1)
+	if(situation[client] == 1 && number)
 	{
 		onmenu[client] = 0;
 		GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
