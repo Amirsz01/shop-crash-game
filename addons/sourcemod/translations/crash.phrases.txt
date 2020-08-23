@@ -1,10 +1,3 @@
-// Exported from SourceMod Translator
-// Date: 2020-08-11 13:13:14 UTC
-// Language: English (en)
-// 
-// To view other translations for this plugin, please visit:
-// http://translator.mitchdempsey.com/sourcemod_plugins/328
-//
 "Phrases"
 {
 
@@ -93,5 +86,41 @@
 	{
 		"en"		"Gained"
 	}
-
+	"close"
+	{
+		"en"		"Close"
+	}
+	"withdraw"
+	{
+		"en"		"Windraw"
+	}
+	"okey"
+	{
+		"en"		"Okey"
+	}
+	"title"
+	{
+		"en"		"Game \"Crash\""
+	}
+	"autowind"
+	{
+		"en"		"AutoWindraw"
+	}
+	"crash_already_coming"
+	{
+		"en"		"You cannot set while the game is in progress."
+	}
+	"wrong_write"
+	{
+		"en"		"Input error. Try again."
+	}
+	"invalid_number"
+	{
+		"en"		"Try again. You must enter a number from 1.00 to 100.00."
+	}
+	"writeinchat"
+	{
+		"en"		"Enter a number from 1.00 to 100.00 at which auto output will occur."
+	}
 }
+

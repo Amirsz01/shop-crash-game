@@ -1,4 +1,4 @@
-#include <multicolors>
+#include <csgo_colors>
 #include <sourcemod>
 #include <sdktools>
 #include <shop>
@@ -7,18 +7,26 @@
 #pragma newdecls required
 #pragma tabsize 0
 
+/*
+*	1.2.5 - Фикс багов
+*	1.2.6 - Раширен перевод и добавлен автовывод
+*/
 #define LOGS "addons/sourcemod/logs/crash.log"
 
 public Plugin myinfo = 
 {
 	name = "[Shop] Crash Game",
-	author = "Emur, Amirsz",
+	author = "Amirsz, Emur",
 	description = "Crash game for players.",
-	version = "1.2.3",
-	url = "https://steamcommunity.com/id/EmurIsTaken/"
+	version = "1.2.6",
+	url = "https://steamcommunity.com/id/Amirsz/"
 };
 //CVars
 Handle crash_time, crash_max, crash_min;
+
+KeyValues hKeyValues;
+
+ArrayList hArray;
 
 //Countdown
 int seconds;
@@ -27,14 +35,19 @@ int onmenu[MAXPLAYERS + 1]; //To see is player on the panel or not.
 int situation[MAXPLAYERS + 1]; //To see player's situation in the game.
 int isstarted; //To see is game on or not.
 int bet[MAXPLAYERS + 1], totalgained[MAXPLAYERS + 1];
+
+bool g_bSayCMD[MAXPLAYERS + 1];
+bool autowind_state[MAXPLAYERS + 1];
+
 float number; //The number that gets higher.
 float x; // The number that is the limit.
+float autowind[MAXPLAYERS + 1];
 
 public void OnPluginStart()
 {
 	//Trans
 	LoadTranslations("crash.phrases.txt");
-	
+
 	//ConVars
 	crash_time = CreateConVar("crash_time", "30", "How many seconds should it take to start.");
 	crash_max = CreateConVar("crash_max", "10000", "Maximum amount of bets.");
@@ -44,6 +57,7 @@ public void OnPluginStart()
 	
 	//Commands
 	RegConsoleCmd("sm_crash", crash, "Command to see the panel");
+	RegAdminCmd("sm_crash_reload", Command_Reload, ADMFLAG_ROOT, "Displays the admin menu");
 	
 	seconds = GetConVarInt(crash_time);
 	CreateTimer(1.0, maintimer, _, TIMER_REPEAT); //The timer that counts down.
@@ -52,6 +66,8 @@ public void OnPluginStart()
 	{
 		Shop_Started();
 	}
+
+	hArray = new ArrayList(3);
 }
 
 public void OnPluginEnd()
@@ -61,6 +77,7 @@ public void OnPluginEnd()
 
 public void OnMapStart()
 {
+	LoadCfg();
 	AddFileToDownloadsTable("sound/emur/crash/sifir.mp3");
 	AddFileToDownloadsTable("sound/emur/crash/kazandi.mp3");
 	PrecacheSound("emur/crash/sifir.mp3");
@@ -68,6 +85,33 @@ public void OnMapStart()
 	LogToFileEx(LOGS,"Карта началась");
 }
 
+void LoadCfg()
+{
+	char szPath[256];
+	BuildPath(Path_SM, szPath, sizeof(szPath), "configs/shop/crash.ini");
+	hKeyValues = new KeyValues("Crash");
+	float chance[3];
+	if(hArray.Length)
+		hArray.Clear();
+	if(hKeyValues.ImportFromFile(szPath))
+	{
+		hKeyValues.Rewind();
+		if(hKeyValues.GotoFirstSubKey())
+		{
+			do 
+			{
+				chance[0] = hKeyValues.GetFloat("chance");
+				chance[1] = hKeyValues.GetFloat("min_value");
+				chance[2] = hKeyValues.GetFloat("max_value");
+				hArray.PushArray(chance, 3);
+			} while (hKeyValues.GotoNextKey());
+		}
+	}
+	else
+	{
+		SetFailState("Cannot open configs/shop/crash.ini");
+	}
+}
 public void OnMapEnd()
 {
 	LogToFileEx(LOGS,"Карта закончилась");
@@ -87,6 +131,11 @@ public void OnClientDisconnect(int client) // Каллбек нашего тай
 	}
 }
 
+public void OnClientPutInServer(int iClient){
+	autowind[iClient] = 0.0;
+	autowind_state[iClient] = false;
+}
+
 public void Shop_Started()
 {
 	Shop_AddToFunctionsMenu(FunctionDisplay, FunctionSelect);
@@ -95,7 +144,7 @@ public void Shop_Started()
 public void FunctionDisplay(int client, char[] buffer, int maxlength)
 {
 	char title[64];
-	FormatEx(title, sizeof(title), "Crash Game");
+	FormatEx(title, sizeof(title), "%t", "title");
 	strcopy(buffer, maxlength, title);
 }
 
@@ -109,6 +158,13 @@ void ShowMenu_Main(int client)
 {
 	onmenu[client] = 1;
 	CreateTimer(0.1, crashpanel, client, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+}
+
+public Action Command_Reload(int client, int args)
+{
+	LoadCfg();
+	ReplyToCommand(client, "Crash game configuration successfuly reloaded!");
+	return Plugin_Handled;
 }
 
 public Action crash(int client, int args)
@@ -127,17 +183,17 @@ public Action crash(int client, int args)
 		bet[client] = StringToInt(arg1);
 		if(Shop_GetClientCredits(client) < bet[client])
 		{
-			CPrintToChat(client, "{darkred}[SM] {default}%t", "Yetersizkredi");
+			CGOPrintToChat(client, "{LIGHTRED}[SM]{DEFAULT} %t", "Yetersizkredi");
 			return Plugin_Handled;
 	   	 }
 	   	else if(bet[client] > GetConVarInt(crash_max))
 		{
-			CPrintToChat(client, "{darkred}[SM] {default}%t", "Yuksekbahis", GetConVarInt(crash_max));
+			CGOPrintToChat(client, "{LIGHTRED}[SM]{DEFAULT} %t", "Yuksekbahis", GetConVarInt(crash_max));
 			return Plugin_Handled;
 	   	 }
 	  	else if(bet[client] < GetConVarInt(crash_min))
 	   	{
-	    	CPrintToChat(client, "{darkred}[SM] {default}%t", "Endusukbahis", GetConVarInt(crash_min));
+	    	CGOPrintToChat(client, "{LIGHTRED}[SM]{DEFAULT} %t", "Endusukbahis", GetConVarInt(crash_min));
 			return Plugin_Handled;
 	    	}
 	   	else
@@ -146,21 +202,56 @@ public Action crash(int client, int args)
 		  	situation[client] = 1;
 			GetClientAuthId(client, AuthId_Steam2, steamid, sizeof(steamid));
 			LogToFileEx(LOGS,"%N(%s) - сделал ставку %d кредитов", client, steamid, bet[client]);
-		   	CPrintToChat(client, "{darkred}[SM] {default}%t", "bahisbasarili");
+		   	CGOPrintToChat(client, "{LIGHTRED}[SM]{DEFAULT} %t", "bahisbasarili");
 		}   	 
     }
    	else if(situation[client] != 1 )
     {
-    	CPrintToChat(client, "{darkred}[SM] {default}%t", "isstartedd");
+    	CGOPrintToChat(client, "{LIGHTRED}[SM]{DEFAULT} %t", "isstartedd");
    	}
    	else if(isstarted == 1)
     {
-    	CPrintToChat(client, "{darkred}[SM] {default}%t", "zatenbahis");
+    	CGOPrintToChat(client, "{LIGHTRED}[SM]{DEFAULT} %t", "zatenbahis");
     }
    	return Plugin_Stop;
 }
 
+public Action OnClientSayCommand(int iClient, const char[] command, const char[] sArgs)
+{
+	if(g_bSayCMD[iClient])
+	{
+		if(!isstarted)
+		{
+			float iArgs = StringToFloat(sArgs);
+			if(!(1.0 < iArgs <= 100.0))
+			{
+				CGOPrintToChat(iClient, "{LIGHTRED}[SM]{DEFAULT} %t", !FloatInStr(sArgs) ? "wrong_write" : "invalid_number");
+				g_bSayCMD[iClient] = false;
+				return Plugin_Handled;
+			}
+			g_bSayCMD[iClient] = false;
+			autowind[iClient] = iArgs;
+			return Plugin_Handled;
+		}
+		else
+		{
+			CGOPrintToChat(iClient, "{LIGHTRED}[SM]{DEFAULT} %t", "crash_already_coming");
+			g_bSayCMD[iClient] = false;
+		}
+	}
 
+	return Plugin_Continue;
+}
+
+stock bool FloatInStr(const char[] buffer)
+{
+	for(int i, len = strlen(buffer); i < len; ++i)
+	{
+		if(IsCharNumeric(buffer[i]) || buffer[i] == '.')
+			return true;
+	}
+	return false;
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public Action maintimer(Handle timer)
 {
@@ -174,11 +265,11 @@ public Action maintimer(Handle timer)
 		    	if(seconds > 60)
 		    	{
 				    int minutes = seconds / 60;
-				    CPrintToChat(i, "{darkred}[SM] {default}%t", "sondakika", minutes);	    
+				    CGOPrintToChat(i, "{LIGHTRED}[SM]{DEFAULT} %t", "sondakika", minutes);	    
 	        	}
 	        	else if(seconds == 60)
 	        	{
-	        		CPrintToChat(i, "{darkred}[SM] {default}%t", "1dakika");
+	        		CGOPrintToChat(i, "{LIGHTRED}[SM]{DEFAULT} %t", "1dakika");
 	        	}
 	        	else
 	        	{
@@ -191,7 +282,7 @@ public Action maintimer(Handle timer)
     						CreateTimer(0.1, crashpanel, i, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
         				}
     				}			
-	    		   	CPrintToChat(i, "{darkred}[SM] {default}%t", "sonsaniye" ,seconds);	    
+	    		   	CGOPrintToChat(i, "{LIGHTRED}[SM]{DEFAULT} %t", "sonsaniye" ,seconds);	    
 	        	}
 	        }
 	  	 }	
@@ -209,23 +300,20 @@ public void StartTheGame()
 	
 	//Gets the X
 	int luckynumber = GetRandomInt(1, 100);
-	if(luckynumber <= 15)
+	float chance[3];
+	int FullChance = 0;
+	int groupId = 0;
+	do
 	{
-		x = GetRandomFloat(1.00, 1.25);
-    }
-   	else if(luckynumber <= 70 && luckynumber > 15)
-    {
-    	x = GetRandomFloat(1.25, 2.00);
-    }
- 	else if(luckynumber <= 98 && luckynumber > 70)
-    {
-    	x = GetRandomFloat(2.00, 10.00);
-    }
- 	else if (luckynumber <= 100 && luckynumber > 98)
-    {
-    	x = GetRandomFloat(6.00, 100.00);
-    }
-	
+		if(groupId > hArray.Length-1)
+		{
+			SetFailState("LN: %i, FC: %i, 1:%f, 2:f, 3:f", luckynumber, FullChance, chance[0], chance[1], chance[2]);
+		}
+		hArray.GetArray(groupId, chance, 3);
+		FullChance = FullChance + RoundFloat(chance[0]);
+		groupId++;
+	}while(luckynumber > FullChance);
+	x = GetRandomFloat(chance[1], chance[2]);
 	CreateTimer(0.1, makeithigher, _, TIMER_REPEAT); // That boi will increase the number.
 }
 
@@ -272,9 +360,8 @@ public Action crashpanel(Handle timer, any client)
 	//I dont have any idea about this part.
 	if(onmenu[client] == 1 && IsClientInGame(client) && !IsFakeClient(client))
 	{
-		char betword[64], gainedcredits[64];
-		Format(betword, sizeof(betword), "%t", "bahis");
-		Format(gainedcredits, sizeof(gainedcredits), "%t", "kazanilan");
+		SetGlobalTransTarget(client);
+		char tmp_buf[64];
 		if(isstarted == 0)
 		{
 			char kalansaniye[32];
@@ -305,14 +392,18 @@ public Action crashpanel(Handle timer, any client)
 	        {
 	    	    char buffer[64];
 	    	    char buffer2[64];
-	    	    Format(buffer, sizeof(buffer), "%s: %d", betword,bet[client]);
-	    	    Format(buffer2, sizeof(buffer2), "%s: -",gainedcredits);
+	    	    Format(buffer, sizeof(buffer), "%t: %d", "bahis" ,bet[client]);
+	    	    Format(buffer2, sizeof(buffer2), "%t: -","kazanilan");
 	    	    crashmenu_baslamadan.DrawText(buffer2);
 	    	    crashmenu_baslamadan.DrawText(buffer);
 	    	    crashmenu_baslamadan.DrawText("---------------------------------");
 	        }
+			SetPanelCurrentKey(crashmenu_baslamadan, 5);
+			Format(tmp_buf, sizeof(tmp_buf), "%t: %3.2f", "autowind", autowind[client]);
+			crashmenu_baslamadan.DrawItem(tmp_buf);
 	        SetPanelCurrentKey(crashmenu_baslamadan, 9);
-	        crashmenu_baslamadan.DrawItem("Close");
+			Format(tmp_buf, sizeof(tmp_buf), "%t", "close");
+	        crashmenu_baslamadan.DrawItem(tmp_buf);
 	        crashmenu_baslamadan.DrawText("---------------------------------");
 	        crashmenu_baslamadan.Send(client, crashmenu, 1);
 	        delete crashmenu_baslamadan;
@@ -328,10 +419,11 @@ public Action crashpanel(Handle timer, any client)
 		    {
 		    	Format(numberZ, sizeof(numberZ), "|                x%3.2f", x);
 		    }
-		    Format(betZ, sizeof(betZ), "%s: %d",betword, bet[client]);
-		    Format(gainedZ, sizeof(gainedZ), "%s: %d",gainedcredits, RoundToFloor(bet[client] * number));
+		    Format(betZ, sizeof(betZ), "%t: %d", "bahis", bet[client]);
+		    Format(gainedZ, sizeof(gainedZ), "%t: %d","kazanilan", RoundToFloor(bet[client] * number));
 		    Panel crashmenu_aktif = new Panel();
-		    crashmenu_aktif.SetTitle("Crash");
+			Format(tmp_buf, sizeof(tmp_buf), "%t", "title");
+		    crashmenu_aktif.SetTitle(tmp_buf);
 		    crashmenu_aktif.DrawText("---------------------------------");
             crashmenu_aktif.DrawText("^");
             crashmenu_aktif.DrawText("|  ");
@@ -352,7 +444,8 @@ public Action crashpanel(Handle timer, any client)
             if(situation[client] == 0)
             {
             	SetPanelCurrentKey(crashmenu_aktif, 9);
-            	crashmenu_aktif.DrawItem("Close");
+				Format(tmp_buf, sizeof(tmp_buf), "%t", "close");
+            	crashmenu_aktif.DrawItem(tmp_buf);
             	crashmenu_aktif.DrawText("---------------------------------");
             	if(number != 0.0)
             	{
@@ -373,7 +466,7 @@ public Action crashpanel(Handle timer, any client)
                 else if(situation[client] == 2)
                 {
                 	char lastgain[32];
-                	Format(lastgain, sizeof(lastgain), "%s: %d",gainedcredits, totalgained[client]);
+                	Format(lastgain, sizeof(lastgain), "%t: %d", "kazanilan", totalgained[client]);
                 	crashmenu_aktif.DrawText(lastgain);
                 }
             	crashmenu_aktif.DrawText(betZ);
@@ -382,16 +475,27 @@ public Action crashpanel(Handle timer, any client)
             	{
             		if(number != 0.0)
             		{
-            			SetPanelCurrentKey(crashmenu_aktif, 9);
-            		    crashmenu_aktif.DrawItem("Withdraw");
-            		    crashmenu_aktif.DrawText("---------------------------------");
-            		    crashmenu_aktif.Send(client, crashmenu_go, 1);
-            		    delete crashmenu_aktif;
+						if(autowind[client] && autowind[client] <= number)
+						{
+							autowind_state[client] = true;
+							crashmenu_aktif.Send(client, crashmenu_go, 1);
+							delete crashmenu_aktif;
+						}
+						else
+						{
+							SetPanelCurrentKey(crashmenu_aktif, 9);
+							Format(tmp_buf, sizeof(tmp_buf), "%t", "withdraw");
+							crashmenu_aktif.DrawItem(tmp_buf);
+							crashmenu_aktif.DrawText("---------------------------------");
+							crashmenu_aktif.Send(client, crashmenu_go, 1);
+							delete crashmenu_aktif;
+						}
             	    }
             	    else
             	    {
             	    	SetPanelCurrentKey(crashmenu_aktif, 9);
-            	    	crashmenu_aktif.DrawItem("Okey");
+						Format(tmp_buf, sizeof(tmp_buf), "%t", "okey");
+            	    	crashmenu_aktif.DrawItem(tmp_buf);
             	    	crashmenu_aktif.DrawText("---------------------------------");
             		    crashmenu_aktif.Send(client, crashmenu_go, 5);  
 						delete crashmenu_aktif;            		    
@@ -400,7 +504,8 @@ public Action crashpanel(Handle timer, any client)
                 else if(situation[client] == 2)
                 {
                 	SetPanelCurrentKey(crashmenu_aktif, 9);
-                	crashmenu_aktif.DrawItem("Close");
+					Format(tmp_buf, sizeof(tmp_buf), "%t", "close");
+                	crashmenu_aktif.DrawItem(tmp_buf);
                 	crashmenu_aktif.DrawText("---------------------------------");
                 	if(number != 0.0)
                 	{
@@ -434,20 +539,29 @@ public int crashmenu_go(Menu menu, MenuAction action, int param1, int param2)
 	  	else if(situation[param1] == 1 && number != 0)
 		{
 			char steamid[32];
-			totalgained[param1] = RoundToFloor(bet[param1] * number);
 			GetClientAuthId(param1, AuthId_Steam2, steamid, sizeof(steamid));
+			if(autowind_state[param1])
+			{
+				totalgained[param1] = RoundToFloor(bet[param1] * autowind[param1]);
+			}
+			else
+			{
+				totalgained[param1] = RoundToFloor(bet[param1] * number);
+			}
 			LogToFileEx(LOGS,"%N(%s) - выиграл %d кредитов с коэффициентом %3.2f", param1, steamid, totalgained[param1], number);
 			situation[param1] = 2;
-	   		Shop_GiveClientCredits(param1, totalgained[param1]);
+			autowind_state[param1] = false;
+	   		Shop_SetClientCredits(param1, Shop_GetClientCredits(param1) + totalgained[param1]);
 			
 	   		if(number > 5)
 			{
-				CPrintToChatAll("{darkred}[SM] %t", "5xkazandin", param1, number, totalgained[param1]);
+				EmitSoundToClient(param1, "emur/crash/kazandi.mp3");
+				CGOPrintToChatAll("{LIGHTRED}[SM]{DEFAULT} %t", "5xkazandin", param1, number, totalgained[param1]);
 		    }
 		 	else
 		    {
 		    	EmitSoundToClient(param1, "emur/crash/kazandi.mp3");
-		    	CPrintToChat(param1, "{darkred}[SM] %t", "1xkazandin", number, totalgained[param1]);
+		    	CGOPrintToChat(param1, "{LIGHTRED}[SM]{DEFAULT} %t", "1xkazandin", number, totalgained[param1]);
 		    }
 	    }
 	 	else if(situation[param1] == 2)
@@ -460,6 +574,27 @@ public int crashmenu_go(Menu menu, MenuAction action, int param1, int param2)
     }
   	else if(action == MenuAction_Cancel)
     {
+		if(situation[param1] == 1 && number != 0 && autowind_state[param1])
+		{
+			char steamid[32];
+			GetClientAuthId(param1, AuthId_Steam2, steamid, sizeof(steamid));
+			totalgained[param1] = RoundToFloor(bet[param1] * autowind[param1]);
+			LogToFileEx(LOGS,"%N(%s) - выиграл %d кредитов с коэффициентом %3.2f", param1, steamid, totalgained[param1], number);
+			situation[param1] = 2;
+			autowind_state[param1] = false;
+			Shop_SetClientCredits(param1, Shop_GetClientCredits(param1) + totalgained[param1]);
+			
+			if(number > 5)
+			{
+				EmitSoundToClient(param1, "emur/crash/kazandi.mp3");
+				CGOPrintToChatAll("{LIGHTRED}[SM]{DEFAULT} %t", "5xkazandin", param1, number, totalgained[param1]);
+			}
+			else
+			{
+				EmitSoundToClient(param1, "emur/crash/kazandi.mp3");
+				CGOPrintToChat(param1, "{LIGHTRED}[SM]{DEFAULT} %t", "1xkazandin", number, totalgained[param1]);
+			}
+		}
     }
 }
 
@@ -467,7 +602,16 @@ public int crashmenu(Menu menu, MenuAction action, int param1, int param2)
 {
 	if(action == MenuAction_Select)
 	{
-		onmenu[param1] = 0;
+		switch(param2)
+		{
+			case 5:
+			{
+				CGOPrintToChat(param1, "{LIGHTRED}[SM]{DEFAULT} %t", "writeinchat");
+				g_bSayCMD[param1] = true;
+			}
+			default:
+				onmenu[param1] = 0;
+		}
     }
   	else if(action == MenuAction_End)
     {
